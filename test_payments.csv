@@ -1,0 +1,7 @@
+Date,Full Name,Gross Amount,Anonymous?
+2023-01-01,John Doe,$100.00,True
+2023-01-02,Jane Smith,$50.00,False
+2023-01-03,John Doe,$25.50,True
+2023-01-04,Anonymous Donor,$500.00,True
+2023-01-05,Bob Jones,$75.00,False
+2023-01-06,Alice Brown,$200.00,True
