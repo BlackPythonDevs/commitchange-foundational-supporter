@@ -33,7 +33,7 @@ def main(
                 YEAR(Date) as Year,
                 "Full Name"
             FROM read_csv_auto('{file_path}')
-            WHERE "Anonymous?" = {allow_anonymous}
+            WHERE "Anonymous?" = {allow_anonymous} and "Full Name" NOT Null
             GROUP BY YEAR(Date), "Full Name"
             HAVING SUM(CAST(REPLACE(REPLACE("Gross Amount", '$', ''), ',', '') AS DECIMAL(10, 2))) > {limit}
             ORDER BY Year DESC, "Full Name" ASC
