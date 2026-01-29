@@ -2,6 +2,7 @@ import typer
 import duckdb
 import json
 import sys
+from collections import defaultdict
 
 
 def main(
@@ -9,7 +10,10 @@ def main(
     allow_anonymous: bool = typer.Argument(
         default=False, help="Should you include or exclude donors listed anonymous"
     ),
-):
+    limit: int = typer.Argument(
+        default=200, help="The minimum gross amount to include"
+    ),
+) -> None:
     """
     Process payments.csv to sum gross amounts by donor name,
     excluding those with 'Anonymous?' = False.
@@ -26,25 +30,25 @@ def main(
 
         query = f"""
             SELECT 
-                "Full Name", 
-                SUM(CAST(REPLACE(REPLACE("Gross Amount", '$', ''), ',', '') AS DECIMAL(10, 2))) AS "Total Gross Amount"
+                YEAR(Date) as Year,
+                "Full Name"
             FROM read_csv_auto('{file_path}')
-            WHERE "Anonymous?" = false
-            GROUP BY "Full Name"
-            ORDER BY "Total Gross Amount" DESC
+            WHERE "Anonymous?" = {allow_anonymous}
+            GROUP BY YEAR(Date), "Full Name"
+            HAVING SUM(CAST(REPLACE(REPLACE("Gross Amount", '$', ''), ',', '') AS DECIMAL(10, 2))) > {limit}
+            ORDER BY Year DESC, "Full Name" ASC
         """
 
-        # Execute and fetch as a dictionary/JSON compatible format
-        # duckdb.sql().df() or .fetchall() could work, but let's try to get a list of dicts directly if possible,
-        # or construct it.
+        # Execute and fetch as a list of tuples
+        result = con.execute(query).fetchall()
 
-        result = con.execute(query).fetchdf()
-
-        # Convert to dictionary records
-        json_output = result.to_dict(orient="records")
+        # Group by Year
+        grouped_output = defaultdict(list)
+        for year, name in result:
+            grouped_output[str(year)].append(name)
 
         # Print JSON to stdout
-        print(json.dumps(json_output, indent=2))
+        print(json.dumps(grouped_output, indent=2))
 
     except Exception as e:
         typer.echo(f"Error processing file: {e}", err=True)
