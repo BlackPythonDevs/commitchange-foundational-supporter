@@ -7,12 +7,10 @@ from collections import defaultdict
 
 def main(
     file_path: str = typer.Argument(..., help="Path to the payments.csv file"),
-    allow_anonymous: bool = typer.Argument(
+    allow_anonymous: bool = typer.Option(
         default=False, help="Should you include or exclude donors listed anonymous"
     ),
-    limit: int = typer.Argument(
-        default=200, help="The minimum gross amount to include"
-    ),
+    limit: int = typer.Option(default=200, help="The minimum gross amount to include"),
 ) -> None:
     """
     Process payments.csv to sum gross amounts by donor name,
@@ -45,7 +43,7 @@ def main(
         # Group by Year
         grouped_output = defaultdict(list)
         for year, name in result:
-            grouped_output[str(year)].append(name)
+            grouped_output[str(year)].append(name.title())
 
         # Print JSON to stdout
         print(json.dumps(grouped_output, indent=2))
