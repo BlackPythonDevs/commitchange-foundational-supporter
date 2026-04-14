@@ -1,14 +1,15 @@
-# Payment Processing CLI
+# Foundational Supporters Web App
 
-A command-line tool built with [Typer](https://typer.tiangolo.com/) and [DuckDB](https://duckdb.org/) to process payment CSV files. It calculates the total gross amount per donor, excluding those marked as not anonymous.
+A web application built with [FastAPI](https://fastapi.tiangolo.com/) and [DuckDB](https://duckdb.org/) to process payment CSV files. It calculates the total gross amount per donor and presents the data either grouped by year or as a lifetime total.
 
 ## Features
 
-- Reads a CSV file using DuckDB.
-- Aggregates by `Year` and `Full Name`.
-- Filters records based on anonymous status (Defaults to showing non-anonymous donors).
-- Filters records based on a minimum gross amount (Defaults to 200).
-- Outputs the result as a JSON dictionary grouped by year.
+- **Web Interface:** Drag-and-drop file upload for processing `payments.csv` files.
+- **Two Processing Modes:**
+  - **Annual**: Aggregates by `Year` and `Full Name`.
+  - **Lifetime**: Aggregates total gross amounts for the donor's entire lifetime.
+- **Minimum Contribution Filter:** Excludes records based on a minimum gross amount (Defaults to $200).
+- **JSON Output:** Renders the result as formatted JSON with a one-click "Copy to Clipboard" feature.
 
 ## Prerequisites
 
@@ -32,27 +33,23 @@ This project uses `uv` for dependency management.
 
 ## Usage
 
-Run the script using `uv run`.
+Start the web server using `uv run`.
 
 ```bash
-uv run main.py <file_path> [allow_anonymous] [limit]
+uv run main.py
 ```
 
-**Arguments:**
+This will start the FastAPI application on `http://127.0.0.1:8080`.
 
-*   `file_path`: Path to the payments CSV file.
-*   `allow_anonymous` (Optional): Set to `True` to show *only* anonymous donors, or `False` (default) to show *only* public donors.
-*   `limit` (Optional): The minimum total gross amount required for a donor to be included in the report. Defaults to `200`.
+**Using the Web Interface:**
 
-### Example
+1. Navigate to `http://127.0.0.1:8080` in your web browser.
+2. Select your view type: **Annual Supporters** or **Lifetime Supporters**.
+3. Set your **Minimum Contribution** (defaults to `200`).
+4. Drag and drop your `payments.csv` file into the upload zone (or click to browse).
+5. The processed results will immediately be displayed on the page as JSON.
 
-Given a `test_payments.csv` file:
-
-```bash
-uv run main.py test_payments.csv True 0
-```
-
-**Sample `payments.csv`:**
+**Sample `payments.csv` Format:**
 
 ```csv
 Date,Full Name,Gross Amount,Anonymous?
@@ -64,7 +61,7 @@ Date,Full Name,Gross Amount,Anonymous?
 2023-01-06,Alice Brown,$200.00,True
 ```
 
-**Output:**
+**Sample Output (Annual Mode):**
 
 ```json
 {
@@ -74,4 +71,14 @@ Date,Full Name,Gross Amount,Anonymous?
     "John Doe"
   ]
 }
+```
+
+**Sample Output (Lifetime Mode):**
+
+```json
+[
+  "Alice Brown",
+  "Anonymous Donor",
+  "John Doe"
+]
 ```
