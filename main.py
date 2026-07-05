@@ -94,4 +94,8 @@ async def upload_file(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", host="127.0.0.1", port=8080, reload=True)
+    # Honor the port pitchfork (or any supervisor) injects via $PORT, so its
+    # open-port finding (`port = { bump = true }`) is respected. Falls back to
+    # 8080 when run standalone.
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run("main:app", host="127.0.0.1", port=port, reload=True)

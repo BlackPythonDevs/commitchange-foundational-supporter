@@ -1,0 +1,16 @@
+# Pitchfork process manager config — https://pitchfork.jdx.dev
+# Run `pitchfork run foundational-supporters` (or enable auto-start below and
+# `cd` into the project) to launch the app as a managed daemon.
+
+[daemons.foundational-supporters]
+run = "uv run python main.py"
+
+# Auto start/stop when entering and leaving this project directory.
+auto = ["start", "stop"]
+
+# Open-port finding: start at 8080 and bump upward until a free port is found.
+# The chosen port is injected into the daemon as $PORT, which main.py reads.
+port = { expect = [8080], bump = true }
+
+# Consider the daemon ready once uvicorn reports startup is complete.
+ready_output = "Application startup complete"
